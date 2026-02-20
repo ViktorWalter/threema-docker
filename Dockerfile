@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Create a normal user
-RUN useradd -m -u 1001 flatpakuser
+RUN useradd -m -u 1000 flatpakuser
 
 # Give them a home directory for Flatpak installs
 ENV HOME=/home/flatpakuser
@@ -50,6 +50,8 @@ COPY entrypoint.sh /home/flatpakuser/entrypoint.sh
 
 # Ensure runtime dirs exist
 RUN mkdir -p /run/dbus && chmod 755 /run/dbus
+RUN mkdir -p /home/flatpakuser/.var && \
+    mkdir -p /home/flatpakuser/.var/app
 
 RUN chown -R flatpakuser:flatpakuser /home/flatpakuser
 
