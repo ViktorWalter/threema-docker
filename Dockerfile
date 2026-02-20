@@ -2,15 +2,20 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Create a normal user
-RUN useradd -m -u 1000 flatpakuser
+
+
+RUN set -eux; \
+    existing_user="$(getent passwd 1000 | cut -d: -f1)"; \
+    existing_group="$(id -gn 1000)"; \
+    usermod -l flatpakuser "$existing_user"; \
+    usermod -d /home/flatpakuser -m flatpakuser && \
+    groupmod -n flatpakuser "$existing_group";
 
 # Give them a home directory for Flatpak installs
 ENV HOME=/home/flatpakuser
 WORKDIR /home/flatpakuser
 
 # Allow Flatpak user installs
-RUN chown -R flatpakuser:flatpakuser /home/flatpakuser
 
 # Core dependencies
 RUN apt-get update && apt-get install -y \
@@ -22,6 +27,8 @@ RUN apt-get update && apt-get install -y \
     dbus-user-session \
     fuse \
     gosu \
+    gnome-keyring \
+    libsecret-1-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Add Flatpak stable PPA
@@ -32,30 +39,14 @@ RUN apt-get update && \
     apt-get install -y flatpak=1.16.* && \
     rm -rf /var/lib/apt/lists/*
 
-# Verify version at build time
-RUN flatpak --version
-
-# Optional: add Flathub
-RUN flatpak remote-add --if-not-exists flathub \
-    https://flathub.org/repo/flathub.flatpakrepo && \
-    flatpak remote-add --if-not-exists flathub \
-    https://dl.flathub.org/repo/flathub.flatpakrepo
-#RUN flatpak install org.freedesktop.Platform/x86_64/24.08
-RUN flatpak install --user -y --from \
-    https://releases.threema.ch/flatpak/threema-desktop/ch.threema.threema-desktop.flatpakref && \
-    flatpak override \
-    ch.threema.threema-desktop --filesystem=host
-
-COPY entrypoint.sh /home/flatpakuser/entrypoint.sh
-
 # Ensure runtime dirs exist
 RUN mkdir -p /run/dbus && chmod 755 /run/dbus
-RUN mkdir -p /home/flatpakuser/.var && \
-    mkdir -p /home/flatpakuser/.var/app
 
-RUN chown -R flatpakuser:flatpakuser /home/flatpakuser
+RUN flatpak install -y  --from \
+    https://releases.threema.ch/flatpak/threema-desktop/ch.threema.threema-desktop.flatpakref && \
+    flatpak override  \
+    ch.threema.threema-desktop --filesystem=host
 
-# USER flatpakuser
 
 ENTRYPOINT ["/home/flatpakuser/entrypoint.sh"]
 
