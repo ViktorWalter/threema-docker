@@ -42,5 +42,20 @@ echo "Dropping privileges to flatpakuser"
 exec gosu flatpakuser dbus-run-session -- bash -c '
 set -e
 
-/bin/bash
+echo "Starting GNOME keyring…"
+
+# Create runtime dirs if missing
+mkdir -p "$XDG_RUNTIME_DIR"
+mkdir -p ~/.local/share/keyrings
+
+# Start keyring (secrets component only — no GUI agents)
+eval "$(gnome-keyring-daemon --start --components=secrets)"
+
+export SSH_AUTH_SOCK
+export GNOME_KEYRING_CONTROL
+export GNOME_KEYRING_PID
+
+echo "Keyring started"
+
+/usr/bin/flatpak run ch.threema.threema-desktop
 '
