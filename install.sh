@@ -5,6 +5,15 @@ chmod +x ./run.sh
 chmod +x ./entrypoint.sh
 chmod +x ./build.sh
 
+sudo chown -R $(id -u):$(id -g) ./data/local
+sudo chown -R $(id -u):$(id -g) ./data/config
+sudo chown -R $(id -u):$(id -g) ./data/cache
+sudo chown -R $(id -u):$(id -g) ./data/var
+chmod -R u+rwX ./data/local
+chmod -R u+rwX ./data/config
+chmod -R u+rwX ./data/cache
+chmod -R u+rwX ./data/var
+
 ./build.sh
 
 id=$(docker create threema)
@@ -18,7 +27,8 @@ DESKTOP_FILE_NAME="threema-desktop.desktop"
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-RUN_SCRIPT="$APP_DIR/run.sh"
+
+RUN_SCRIPT="'cd ${APP_DIR} && /usr/bin/env /bin/bash -lc ${APP_DIR}/run.sh'"
 ICON_FILE="$APP_DIR/icon.svg"   # Optional
 
 TARGET_DIR="$HOME/.local/share/applications"
@@ -27,10 +37,6 @@ TARGET_FILE="$TARGET_DIR/$DESKTOP_FILE_NAME"
 echo "Installing launcher to: $TARGET_FILE"
 
 mkdir -p "$TARGET_DIR"
-
-# Ensure run script is executable
-
-chmod +x "$RUN_SCRIPT"
 
 # Create the .desktop file
 

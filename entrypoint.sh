@@ -48,6 +48,10 @@ echo "Starting GNOME keyring…"
 mkdir -p "$XDG_RUNTIME_DIR"
 mkdir -p ~/.local/share/keyrings
 
+mkdir -p /home/flatpakuser/.local/share/flatpak/exports/share
+mkdir -p /home/flatpakuser/.var/app
+chown -R flatpakuser:flatpakuser /home/flatpakuser/.local /home/flatpakuser/.var
+
 # Start keyring (secrets component only — no GUI agents)
 eval "$(gnome-keyring-daemon --start --components=secrets)"
 

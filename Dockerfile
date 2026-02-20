@@ -48,6 +48,7 @@ RUN flatpak install -y  --from \
     ch.threema.threema-desktop --filesystem=host
 
 
+COPY ./entrypoint.sh /home/flatpakuser/entrypoint.sh
 ENTRYPOINT ["/home/flatpakuser/entrypoint.sh"]
 
 # Default shell
