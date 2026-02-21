@@ -35,6 +35,7 @@ if [ "$(stat -c %u /home/flatpakuser)" != "1000" ]; then
     chown flatpakuser:flatpakuser /home/flatpakuser
 fi
 
+export GTK_THEME=Adwaita:dark
 # Fix XDG paths for Flatpak user installs
 export XDG_DATA_DIRS="/home/flatpakuser/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share"
 

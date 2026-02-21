@@ -1,6 +1,12 @@
 #/bin/bash
 xhost +local:
 
+export GTK_THEME=$(gsettings get org.gnome.desktop.interface gtk-theme | tr -d \')
+export ICON_THEME=$(gsettings get org.gnome.desktop.interface icon-theme | tr -d \')
+export XDG_DATA_DIRS=/home/flatpakuser/.local/share:/usr/local/share:/usr/share
+export QT_QPA_PLATFORMTHEME=gtk2
+export QT_STYLE_OVERRIDE=$(kreadconfig5 --file kdeglobals --group KDE --key widgetStyle)
+
 docker run \
   --privileged \
   -e DISPLAY=$DISPLAY \
@@ -14,11 +20,17 @@ docker run \
   -v ./data/config:/home/flatpakuser/.config \
   -v ./data/var:/home/flatpakuser/.var \
   -v /home/${USER}:/home/flatpakuser/host_home \
+  -v /usr/share/themes:/usr/share/themes:ro \
+  -v /usr/share/icons:/usr/share/icons:ro \
+  -v $HOME/.themes:/home/flatpakuser/.themes:ro \
+  -v $HOME/.icons:/home/flatpakuser/.icons:ro \
+  -v $HOME/.config/gtk-3.0:/home/flatpakuser/.config/gtk-3.0:ro \
+  -v $HOME/.config/kdeglobals:/home/flatpakuser/.config/kdeglobals:ro \
   --security-opt seccomp=unconfined \
-  --security-opt apparmor=unconfined \
-  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-  --cap-add=SYS_ADMIN \
-  --device /dev/fuse \
-  threema
+    --security-opt apparmor=unconfined \
+    -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+    --cap-add=SYS_ADMIN \
+    --device /dev/fuse \
+    threema
 
  # The line "-v /home/${USER}:/home/flatpakuser/host_home" allows the user have access to host files - remove if undesirable
