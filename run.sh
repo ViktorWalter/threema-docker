@@ -12,6 +12,8 @@ docker run \
   -e DISPLAY=$DISPLAY \
   -e XAUTHORITY="$XAUTHORITY" \
   -e DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
+  -v /run/user/1000/pulse:/run/user/1000/pulse \
+  -e PULSE_SERVER=unix:/run/user/1000/pulse/native \
   -v "$XAUTHORITY:$XAUTHORITY:ro" \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /tmp:/tmp \
@@ -31,6 +33,8 @@ docker run \
     -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
     --cap-add=SYS_ADMIN \
     --device /dev/fuse \
+    --device /dev/snd \
+    --group-add audio \
     threema
 
  # The line "-v /home/${USER}:/home/flatpakuser/host_home" allows the user have access to host files - remove if undesirable

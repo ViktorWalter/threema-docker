@@ -42,6 +42,7 @@ RUN apt-get update && \
 # Ensure runtime dirs exist
 RUN mkdir -p /run/dbus && chmod 755 /run/dbus
 
+RUN echo "Again"
 RUN flatpak install -y  --from \
     https://releases.threema.ch/flatpak/threema-desktop/ch.threema.threema-desktop.flatpakref && \
     flatpak override  \
